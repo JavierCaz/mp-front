@@ -1,29 +1,12 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 
-import { useLoadingBarContext, useSnackBarContext } from 'hooks';
+import { useLoadingBarContext, useSetPinDialogContext, useSnackBarContext } from 'hooks';
 
 import { Grid, IconButton, TextField } from '@mui/material';
 import UserPassItem from './UserPassItem';
 import PassForm from './PassForm';
 import { Add } from '@mui/icons-material';
-
-const userPassesMock = [{
-    "user": 1,
-    "uri": "www.google.com",
-    "password": "zmaod0gnu383445vyuf",
-    "notes": "google notes",
-    "name": "Google",
-    "id": 1
-},
-{
-    "user": 2,
-    "uri": "https://www.facebook.com",
-    "password": "zmaod0gnu383445vyuf",
-    "notes": "facebook notes",
-    "name": "Facebook",
-    "id": 2
-}]
 
 const UserPasses = () => {
     /*----STATE----*/
@@ -35,6 +18,7 @@ const UserPasses = () => {
     /*----HOOKS----*/
     const { startProgress, stopProgress } = useLoadingBarContext()
     const snackBar = useSnackBarContext()
+    const { mustSetPin, openSetPinDialog } = useSetPinDialogContext()
 
     /*----FUNCTIONS----*/
     const getUserPasses = useCallback(async () => {
@@ -47,15 +31,17 @@ const UserPasses = () => {
                 snackBar('Error fetching user passwords. You are using mock object.')
             else
                 snackBar(error.message)
-            setUserPasses(userPassesMock)
         }
         stopProgress()
     }, [snackBar, startProgress, stopProgress])
 
     const openPassForm = useCallback((pass = undefined) => {
+        if (mustSetPin) {
+            return openSetPinDialog()
+        }
         setPassObject(pass)
         setOpenForm(true)
-    }, [])
+    }, [mustSetPin, openSetPinDialog])
 
     const closePassForm = useCallback(() => {
         setOpenForm(false)
@@ -103,7 +89,7 @@ const UserPasses = () => {
             <IconButton size="large" color="lightgreen" sx={{ justifySelf: 'end' }} onClick={() => openPassForm()}>
                 <Add fontSize="large" sx={{ color: '#00FF00' }} />
             </IconButton>
-            <TextField id="standard-basic" label="Search" variant="standard" value={searchValue} onChange={(e) => setSearchValue(e.target.value.toUpperCase())}/>
+            <TextField id="standard-basic" label="Search" variant="standard" value={searchValue} onChange={(e) => setSearchValue(e.target.value.toUpperCase())} />
             <Grid container spacing={2}>
                 {userPasses.filter(up => up.name.toUpperCase().includes(searchValue)).map((pass, i) => (
                     <UserPassItem

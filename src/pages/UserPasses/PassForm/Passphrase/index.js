@@ -1,48 +1,66 @@
 import React, { useEffect, useState } from 'react'
 
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material'
+import axios from 'axios'
 
 const Passphrase = (props) => {
     /*----PROPS----*/
     const {
         openPassphrase,
         onClosePassphrase,
+        snackBar,
+        passwordId,
     } = props
     /*----STATE----*/
     const [passphrase, setPassphrase] = useState('')
     const [passphraseError, setPassphraseError] = useState(false)
 
     /*----FUNCTIONS----*/
-    const validatePassphrase = () => {
-        if (passphrase === '') return setPassphraseError(true)
-        onClosePassphrase(true)
+    const validatePassphrase = async () => {
+        if (passphrase === '') return setPassphraseError('Invalid entry')
+
+        try {
+            const response = await axios.get(`/api/passes/${passwordId}`, {
+                params: { pin: passphrase }
+            })
+
+            if (response.data.valid) {
+                onClosePassphrase(response.data.pass)
+            } else {
+                setPassphraseError(response.data.message)
+            }
+        } catch (error) {
+            snackBar(error.message)
+        }
     }
 
     /*----EFFECT----*/
     useEffect(() => {
         setPassphrase('')
-        setPassphraseError(false)
+        setPassphraseError('')
     }, [openPassphrase])
 
     /*----RENDER----*/
     return (
-        <Dialog open={openPassphrase} onClose={() => onClosePassphrase(false)}>
-            <DialogTitle>Passphrase</DialogTitle>
+        <Dialog open={openPassphrase}>
+            <DialogTitle>Enter PIN</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    Please enter the passphrase to show password.
+                    Please enter the PIN to show password.
                 </DialogContentText>
                 <TextField
                     autoFocus
                     fullWidth
+                    type="password"
+                    autoComplete="nope"
                     margin="dense"
-                    id="passphrase"
-                    name="passphrase"
-                    label="Passphrase"
+                    id="pin"
+                    name="pin"
+                    label="PIN"
                     value={passphrase}
                     onChange={e => setPassphrase(e.target.value)}
-                    error={passphraseError}
-                    helperText={passphraseError && 'Invalid entry'}
+                    error={passphraseError !== ''}
+                    helperText={passphraseError}
                 />
             </DialogContent>
             <DialogActions>
