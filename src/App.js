@@ -11,10 +11,12 @@ import NoAuthRoute from 'routing/NoAuthRoute'
 import { SnackBarContextProvider } from 'context/SnackBarContext'
 import React from 'react'
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { SetPinDialogContextProvider } from 'context/SetPinDialogContext';
 
 const App = () => {
   const RouterProviders = useComposeProviders(Router, Routes)
-  const AppProviders = useComposeProviders(ScreenSizeContextProvider, LoadingBarContextProvider, SnackBarContextProvider)
+  const AppProviders = useComposeProviders(ScreenSizeContextProvider, LoadingBarContextProvider, SnackBarContextProvider, SetPinDialogContextProvider)
+  const AuthRouteProviders = useComposeProviders(AuthRoute)
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
   const theme = React.useMemo(
@@ -34,7 +36,7 @@ const App = () => {
         <RouterProviders>
           <Route exact path='/' element={<Layout />}>
             {/* Protected routes, accessible with authentication */}
-            <Route element={<AuthRoute />}>
+            <Route element={<AuthRouteProviders />}>
               {authRoutes.map(routeName =>
                 <Route key={routeName} path={routes[routeName].path} element={routes[routeName].element} />
               )}

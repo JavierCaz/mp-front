@@ -91,17 +91,29 @@ const PassForm = (props) => {
         setFormErrors(formErrors => ({ ...formErrors, [e.target.id]: false }))
     }, [])
 
-    const toggleShowPassword = () => {
-        if (showPassword) {
-            setShowPassword(false)
-            return
+    const toggleShowPassword = async () => {
+        startProgress()
+        try {
+            const response = await axios.get(`/api/passes/${formData._id}`)
+
+            if (response.data.valid) {
+                setShowPassword(true)
+                setFormData(formData => ({ ...formData, password: response.data.pass }))
+            } else {
+                setOpenPassphrase(true)
+            }
+        } catch (error) {
+            snackBar(error.message)
         }
-        setOpenPassphrase(true)
+        stopProgress()
     }
 
-    const onClosePassphrase = useCallback((validPassphrase) => {
+    const onClosePassphrase = useCallback((password = '') => {
         setOpenPassphrase(false)
-        setShowPassword(validPassphrase)
+        if (password) {
+            setShowPassword(true)
+            setFormData(formData => ({ ...formData, password }))
+        }
     }, [])
 
     /*----RENDER----*/
@@ -152,14 +164,17 @@ const PassForm = (props) => {
                             disabled={!showPassword}
                             InputProps={{
                                 endAdornment:
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            onClick={toggleShowPassword}
-                                            edge="end"
-                                        >
-                                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                                        </IconButton>
-                                    </InputAdornment>,
+                                    <>{
+                                        formData.hasOwnProperty('_id') && !showPassword &&
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                onClick={toggleShowPassword}
+                                                edge="end"
+                                            >
+                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }</>,
                             }}
                         />
                         <TextField
@@ -186,7 +201,9 @@ const PassForm = (props) => {
             </Modal>
             <Passphrase {...{
                 openPassphrase,
-                onClosePassphrase
+                onClosePassphrase,
+                snackBar,
+                passwordId: formData._id
             }} />
         </Fragment>
     )
