@@ -89,9 +89,9 @@ const UserPasses = () => {
             <IconButton size="large" color="lightgreen" sx={{ justifySelf: 'end' }} onClick={() => openPassForm()}>
                 <Add fontSize="large" sx={{ color: '#00FF00' }} />
             </IconButton>
-            <TextField id="standard-basic" label="Search" variant="standard" value={searchValue} onChange={(e) => setSearchValue(e.target.value.toUpperCase())} />
+            <TextField id="standard-basic" label="Search" variant="standard" value={searchValue} onChange={(e) => setSearchValue(e.target.value)} />
             <Grid container spacing={2}>
-                {userPasses.filter(up => up.name.toUpperCase().includes(searchValue)).map((pass, i) => (
+                {userPasses.filter(up => up.name.toUpperCase().includes(searchValue.toUpperCase())).map((pass, i) => (
                     <UserPassItem
                         key={i}
                         name={pass.name}

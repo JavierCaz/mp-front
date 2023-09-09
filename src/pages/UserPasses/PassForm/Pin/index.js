@@ -3,31 +3,31 @@ import React, { useEffect, useState } from 'react'
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material'
 import axios from 'axios'
 
-const Passphrase = (props) => {
+const Pin = (props) => {
     /*----PROPS----*/
     const {
-        openPassphrase,
-        onClosePassphrase,
+        openPin,
+        onClosePin,
         snackBar,
         passwordId,
     } = props
     /*----STATE----*/
-    const [passphrase, setPassphrase] = useState('')
-    const [passphraseError, setPassphraseError] = useState(false)
+    const [pin, setPin] = useState('')
+    const [pinError, setPinError] = useState(false)
 
     /*----FUNCTIONS----*/
-    const validatePassphrase = async () => {
-        if (passphrase === '') return setPassphraseError('Invalid entry')
+    const validatePin = async () => {
+        if (pin === '') return setPinError('Invalid entry')
 
         try {
-            const response = await axios.get(`/api/passes/${passwordId}`, {
-                params: { pin: passphrase }
+            const response = await axios.get(`/api/passes/getPassword/${passwordId}`, {
+                params: { pin }
             })
 
             if (response.data.valid) {
-                onClosePassphrase(response.data.pass)
+                onClosePin(response.data.pass)
             } else {
-                setPassphraseError(response.data.message)
+                setPinError(response.data.message)
             }
         } catch (error) {
             snackBar(error.message)
@@ -36,13 +36,13 @@ const Passphrase = (props) => {
 
     /*----EFFECT----*/
     useEffect(() => {
-        setPassphrase('')
-        setPassphraseError('')
-    }, [openPassphrase])
+        setPin('')
+        setPinError('')
+    }, [openPin])
 
     /*----RENDER----*/
     return (
-        <Dialog open={openPassphrase}>
+        <Dialog open={openPin}>
             <DialogTitle>Enter PIN</DialogTitle>
             <DialogContent>
                 <DialogContentText>
@@ -57,18 +57,18 @@ const Passphrase = (props) => {
                     id="pin"
                     name="pin"
                     label="PIN"
-                    value={passphrase}
-                    onChange={e => setPassphrase(e.target.value)}
-                    error={passphraseError !== ''}
-                    helperText={passphraseError}
+                    value={pin}
+                    onChange={e => setPin(e.target.value)}
+                    error={pinError !== ''}
+                    helperText={pinError}
                 />
             </DialogContent>
             <DialogActions>
-                <Button variant="contained" color="action" onClick={() => onClosePassphrase(false)}>Cancel</Button>
-                <Button type="submit" variant="contained" onClick={validatePassphrase}>Show</Button>
+                <Button variant="contained" color="action" onClick={() => onClosePin(false)}>Cancel</Button>
+                <Button type="submit" variant="contained" onClick={validatePin}>Show</Button>
             </DialogActions>
         </Dialog>
     )
 }
 
-export default Passphrase
+export default Pin
