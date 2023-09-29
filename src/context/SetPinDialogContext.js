@@ -60,7 +60,7 @@ export const SetPinDialogContextProvider = ({ children }) => {
                     <DialogTitle>Set your PIN</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            Please enter PIN to be able to store and show passwords.
+                            Please enter a PIN to be able to store and show passwords.
                         </DialogContentText>
                         <TextField
                             autoFocus

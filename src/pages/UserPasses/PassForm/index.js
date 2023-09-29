@@ -3,7 +3,7 @@ import axios from 'axios'
 
 import { Box, Button, Card, Grid, IconButton, InputAdornment, Modal, TextField } from '@mui/material'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
-import Passphrase from './Passphrase'
+import Pin from './Pin'
 
 const style = {
     position: 'absolute',
@@ -40,7 +40,7 @@ const PassForm = (props) => {
     /*----STATE----*/
     const [formData, setFormData] = useState(passObject)
     const [formErrors, setFormErrors] = useState(initFormErrors)
-    const [openPassphrase, setOpenPassphrase] = useState(false)
+    const [openPin, setOpenPin] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
 
     /*----FUNCTIONS----*/
@@ -94,13 +94,13 @@ const PassForm = (props) => {
     const toggleShowPassword = async () => {
         startProgress()
         try {
-            const response = await axios.get(`/api/passes/${formData._id}`)
+            const response = await axios.get(`/api/passes/getPassword/${formData._id}`)
 
             if (response.data.valid) {
                 setShowPassword(true)
                 setFormData(formData => ({ ...formData, password: response.data.pass }))
             } else {
-                setOpenPassphrase(true)
+                setOpenPin(true)
             }
         } catch (error) {
             snackBar(error.message)
@@ -108,8 +108,8 @@ const PassForm = (props) => {
         stopProgress()
     }
 
-    const onClosePassphrase = useCallback((password = '') => {
-        setOpenPassphrase(false)
+    const onClosePin = useCallback((password = '') => {
+        setOpenPin(false)
         if (password) {
             setShowPassword(true)
             setFormData(formData => ({ ...formData, password }))
@@ -199,9 +199,9 @@ const PassForm = (props) => {
                     </Card>
                 </Box>
             </Modal>
-            <Passphrase {...{
-                openPassphrase,
-                onClosePassphrase,
+            <Pin {...{
+                openPin,
+                onClosePin,
                 snackBar,
                 passwordId: formData._id
             }} />

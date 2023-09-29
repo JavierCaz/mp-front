@@ -1,8 +1,8 @@
-import { AppRegistration, Home as HomeIcon, Login as LoginIcon } from '@mui/icons-material'
+import { AppRegistration, Home as HomeIcon, Login as LoginIcon, AccountBox as AccountBoxIcon } from '@mui/icons-material'
 
-import { Home, Login, Register } from 'pages'
+import { Home, Login, Register, Account } from 'pages'
 
-export const authRoutes = ['home'] //Redirect to login if user is not authenticated
+export const authRoutes = ['home', 'account'] //Redirect to login if user is not authenticated
 export const noAuthRoutes = ['login', 'signup'] //Redirect to home if user is authenticated
 
 export const routes = {
@@ -23,7 +23,13 @@ export const routes = {
         path: '/register',
         element: <Register />,
         icon: <AppRegistration fontSize="large" />
-    }
+    },
+    account: {
+        name: 'Account',
+        path: '/account',
+        element: <Account />,
+        icon: <AccountBoxIcon fontSize="large" />
+    },
 }
 
 export const pages = [
