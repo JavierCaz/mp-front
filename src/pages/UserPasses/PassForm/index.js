@@ -1,7 +1,7 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react'
 import axios from 'axios'
 
-import { Box, Button, Card, Grid, IconButton, InputAdornment, Modal, TextField } from '@mui/material'
+import { Box, Button, Card, Grid, IconButton, InputAdornment, Modal, TextField, FormControlLabel, Switch } from '@mui/material'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import Pin from './Pin'
 
@@ -28,7 +28,7 @@ const initFormErrors = { name: false, uri: false, password: false, notes: false 
 const PassForm = (props) => {
     /*----PROPS----*/
     const {
-        passObject = { name: '', uri: '', password: '', notes: '' },
+        passObject = { name: '', uri: '', password: '', notes: '', favorite: false },
         openForm,
         closePassForm,
         onSave,
@@ -87,7 +87,8 @@ const PassForm = (props) => {
     }
 
     const handleChange = useCallback(e => {
-        setFormData(formData => ({ ...formData, [e.target.id]: e.target.value }))
+        const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+        setFormData(formData => ({ ...formData, [e.target.id]: value }))
         setFormErrors(formErrors => ({ ...formErrors, [e.target.id]: false }))
     }, [])
 
@@ -187,6 +188,20 @@ const PassForm = (props) => {
                             onChange={handleChange}
                             error={formErrors.notes}
                             helperText={formErrors.notes && 'Invalid entry'}
+                        />
+                        <FormControlLabel
+                            value={formData.favorite}
+                            control={
+                                <Switch 
+                                    id="favorite"
+                                    name="favorite"
+                                    checked={formData.favorite} 
+                                    onChange={handleChange} 
+                                    color="primary" 
+                                />
+                            }
+                            label="Favorite"
+                            labelPlacement="end"
                         />
                         <Grid container spacing={2} justifyContent="flex-end">
                             <Grid item>

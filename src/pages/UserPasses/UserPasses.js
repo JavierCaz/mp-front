@@ -25,7 +25,7 @@ const UserPasses = () => {
         startProgress()
         try {
             const response = await axios.get('/api/passes')
-            setUserPasses(response.data)
+            setUserPasses(sortByFavoritesAlphabetically(response.data))
         } catch (error) {
             if (error.code === 'ERR_NETWORK')
                 snackBar('Error fetching user passwords. You are using mock object.')
@@ -34,6 +34,24 @@ const UserPasses = () => {
         }
         stopProgress()
     }, [snackBar, startProgress, stopProgress])
+
+    const sortByFavoritesAlphabetically = (array) => {
+        array.sort((a, b) => {
+          // Check if 'favorite' property is true or false
+          const aFavorite = a.favorite ? 0 : 1;
+          const bFavorite = b.favorite ? 0 : 1;
+      
+          // If both objects have the same 'favorite' status, sort alphabetically by 'name'
+          if (aFavorite === bFavorite) {
+            return a.name.localeCompare(b.name);
+          }
+      
+          // Sort by 'favorite' status, placing 'favorite' objects before 'non-favorite'
+          return aFavorite - bFavorite;
+        });
+      
+        return array;
+      }
 
     const openPassForm = useCallback((pass = undefined) => {
         if (mustSetPin) {
@@ -57,10 +75,10 @@ const UserPasses = () => {
                         return
                     }
                 })
-                return userPasses
+                return sortByFavoritesAlphabetically(userPasses)
             })
         } else if (actionType === 'POST') {
-            setUserPasses(passwords => [...passwords, pass])
+            setUserPasses(passwords => sortByFavoritesAlphabetically([...passwords, pass]))
         }
     }, [])
 
@@ -80,8 +98,8 @@ const UserPasses = () => {
     /*----EFFECT----*/
     useEffect(() => {
         getUserPasses()
-        // eslint-disable-next-line
     }, [])
+    
 
     /*----RENDER----*/
     return (
@@ -97,6 +115,7 @@ const UserPasses = () => {
                         name={pass.name}
                         uri={pass.uri}
                         notes={pass.notes}
+                        favorite={pass.favorite}
                         handleEdit={() => { openPassForm(pass) }}
                         handleDelete={() => { deletePass(pass._id) }}
                     />
