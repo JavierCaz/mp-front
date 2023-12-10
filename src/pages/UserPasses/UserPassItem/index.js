@@ -4,7 +4,7 @@ import { Box, Card, CardContent, Grid, IconButton, Typography } from '@mui/mater
 
 import { styled } from '@mui/material/styles';
 
-import { Delete, Edit } from '@mui/icons-material';
+import { Delete, Edit, Star } from '@mui/icons-material';
 
 
 const EllipsisTypography = styled(Typography)(({ lines = 1 }) => ({
@@ -20,23 +20,34 @@ const UserPassItem = (props) => {
         uri,
         notes,
         handleEdit,
+        favorite,
         handleDelete,
     } = props
 
     return (
-        <Grid item xs sm="auto" sx={{ maxWidth: { sm: 300 } }}>
+        <Grid item xs sm="auto" sx={{ maxWidth: { sm: 400 } }}>
             <Card sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' } }}>
                 <CardContent sx={{ flex: '1' }}>
                     <Typography gutterBottom variant="subtitle1" component="div">
-                        {name}
+                        {name} {favorite && <Star fontSize="small" color="primary" />}
                     </Typography>
-                    <Typography variant="body2" gutterBottom>
+
+                    <Typography variant="body2" gutterBottom
+                        sx={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            maxWidth: '200px',
+                        }}
+                    >
                         {uri}
                     </Typography>
+
                     <EllipsisTypography variant="body2" color="text.secondary" lines="2">
                         {notes}
                     </EllipsisTypography>
                 </CardContent>
+
                 <Box sx={{ display: 'flex', flexDirection: { sm: 'column' }, justifyContent: { xs: 'flex-end' } }}>
                     <IconButton size="large" onClick={handleEdit}>
                         <Edit color="primary" />
