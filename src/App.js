@@ -19,14 +19,23 @@ const App = () => {
   const AuthRouteProviders = useComposeProviders(AuthRoute)
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
+  const [mode, setMode] = React.useState(prefersDarkMode ? 'dark' : 'light');
+  const colorMode = React.useMemo(
+    () => ({
+      toggleColorMode: () => {
+        setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+      },
+    }),
+    [],
+  );
   const theme = React.useMemo(
     () =>
       createTheme({
         palette: {
-          mode: prefersDarkMode ? 'dark' : 'light',
+          mode,
         },
       }),
-    [prefersDarkMode],
+    [mode],
   );
 
   return (
@@ -34,7 +43,7 @@ const App = () => {
       <CssBaseline />
       <AppProviders>
         <RouterProviders>
-          <Route exact path='/' element={<Layout />}>
+          <Route exact path='/' element={<Layout colorMode={colorMode} />}>
             {/* Protected routes, accessible with authentication */}
             <Route element={<AuthRouteProviders />}>
               {authRoutes.map(routeName =>

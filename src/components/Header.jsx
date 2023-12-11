@@ -1,10 +1,11 @@
-import { useSelector, useDispatch } from "react-redux"
+import { useSelector, useDispatch, } from "react-redux"
 import { logout, reset } from "features/auth/authSlice"
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom"
 import { authRoutes, noAuthRoutes, routes } from "routing/routes"
-import { useCallback, useMemo } from "react"
-import { Link } from "@mui/material"
-import { Logout } from "@mui/icons-material"
+import { useCallback, useMemo, useContext } from "react"
+import { Link, Box, IconButton } from "@mui/material"
+import { Logout, Brightness7, Brightness4 } from "@mui/icons-material"
+import { useTheme } from '@mui/material/styles';
 
 const linkStyle = {
     display: 'grid',
@@ -14,8 +15,14 @@ const linkStyle = {
     textDecoration: 'none'
 }
 
-const Header = () => {
+const Header = (props) => {
+    /*----PROPS----*/
+    const {
+        colorMode
+    } = props
+
     const { user } = useSelector((state) => state.auth)
+    const theme = useTheme();
 
     const { pathname } = useLocation()
     const navigate = useNavigate()
@@ -41,7 +48,10 @@ const Header = () => {
             <Link key='logout' style={{ textTransform: 'none', cursor: 'pointer', ...linkStyle }} onClick={onLogout}>
                 Logout
                 <Logout />
-            </Link>
+            </Link>,
+            <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color="inherit">
+                {theme.palette.mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
+            </IconButton>
             ]
         }
 
