@@ -2,7 +2,7 @@ import React, { Fragment, useCallback, useEffect, useState } from 'react'
 import axios from 'axios'
 
 import { Box, Button, Card, Grid, IconButton, InputAdornment, Modal, TextField, FormControlLabel, Switch } from '@mui/material'
-import { Visibility, VisibilityOff } from '@mui/icons-material'
+import { Visibility, VisibilityOff, ContentCopy } from '@mui/icons-material'
 import Pin from './Pin'
 
 const style = {
@@ -41,6 +41,7 @@ const PassForm = (props) => {
     const [formData, setFormData] = useState(passObject)
     const [formErrors, setFormErrors] = useState(initFormErrors)
     const [openPin, setOpenPin] = useState(false)
+    const [textPin, setTextPin] = useState('')
     const [showPassword, setShowPassword] = useState(false)
 
     /*----FUNCTIONS----*/
@@ -92,21 +93,38 @@ const PassForm = (props) => {
         setFormErrors(formErrors => ({ ...formErrors, [e.target.id]: false }))
     }, [])
 
-    const toggleShowPassword = async () => {
+    const pinValidation = async (callback, text) => {
         startProgress()
+
         try {
             const response = await axios.get(`/api/passes/getPassword/${formData._id}`)
-
+            
             if (response.data.valid) {
-                setShowPassword(true)
                 setFormData(formData => ({ ...formData, password: response.data.pass }))
+                callback(response.data.pass);
             } else {
+                setTextPin(text);
                 setOpenPin(true)
             }
         } catch (error) {
             snackBar(error.message)
         }
+
         stopProgress()
+    }
+
+    const toggleShowPassword = () => {
+        if (showPassword) {
+            setShowPassword(false);
+            stopProgress();
+            return;
+        }
+
+        pinValidation(() => setShowPassword(true), 'show');
+    }
+
+    const toggleCopy = () => {
+        pinValidation((pass) => navigator.clipboard.writeText(pass), 'copy');
     }
 
     const onClosePin = useCallback((password = '') => {
@@ -165,17 +183,27 @@ const PassForm = (props) => {
                             disabled={!showPassword}
                             InputProps={{
                                 endAdornment:
-                                    <>{
-                                        formData.hasOwnProperty('_id') && !showPassword &&
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                onClick={toggleShowPassword}
-                                                edge="end"
-                                            >
-                                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    }</>,
+                                    <>
+                                        {formData.hasOwnProperty('_id') &&
+                                        <>
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    onClick={toggleShowPassword}
+                                                    edge="end"
+                                                >
+                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    onClick={toggleCopy}
+                                                    edge="end"
+                                                >
+                                                    <ContentCopy />
+                                                </IconButton>
+                                            </InputAdornment>
+                                        </>}
+                                    </>,
                             }}
                         />
                         <TextField
@@ -216,6 +244,7 @@ const PassForm = (props) => {
             </Modal>
             <Pin {...{
                 openPin,
+                textPin,
                 onClosePin,
                 snackBar,
                 passwordId: formData._id

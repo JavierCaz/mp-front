@@ -7,6 +7,7 @@ const Pin = (props) => {
     /*----PROPS----*/
     const {
         openPin,
+        textPin,
         onClosePin,
         snackBar,
         passwordId,
@@ -46,7 +47,7 @@ const Pin = (props) => {
             <DialogTitle>Enter PIN</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    Please enter the PIN to show password.
+                    Please enter the PIN to {textPin} password.
                 </DialogContentText>
                 <TextField
                     autoFocus
@@ -65,7 +66,7 @@ const Pin = (props) => {
             </DialogContent>
             <DialogActions>
                 <Button variant="contained" color="action" onClick={() => onClosePin(false)}>Cancel</Button>
-                <Button type="submit" variant="contained" onClick={validatePin}>Show</Button>
+                <Button type="submit" variant="contained" onClick={validatePin}>{textPin}</Button>
             </DialogActions>
         </Dialog>
     )
