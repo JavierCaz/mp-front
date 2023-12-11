@@ -2,10 +2,15 @@ import React from 'react'
 import { Outlet } from 'react-router-dom'
 import Header from './Header'
 
-const Layout = () => {
+const Layout = (props) => {
+    /*----PROPS----*/
+    const {
+        colorMode
+    } = props
+
     return (
         <>
-            <Header />
+            <Header colorMode={colorMode} />
             <Outlet />
         </>
     )
