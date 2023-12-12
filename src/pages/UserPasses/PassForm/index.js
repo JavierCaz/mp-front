@@ -28,7 +28,7 @@ const initFormErrors = { name: false, uri: false, password: false, notes: false 
 const PassForm = (props) => {
     /*----PROPS----*/
     const {
-        passObject = { name: '', uri: '', password: '', notes: '', favorite: false },
+        passObject = { name: '', uri: '', username: '', password: '', notes: '', favorite: false },
         openForm,
         closePassForm,
         onSave,
@@ -48,12 +48,15 @@ const PassForm = (props) => {
     const validateForm = useCallback((formData = {}) => {
         const errors = {}
         let errorCount = 0
+        const notRequired = ['notes', 'username'];
+
         Object.keys(formData).forEach(input => {
-            if (input !== 'notes' && formData[input] === '') {
+            if (!notRequired.includes(input) && formData[input] === '') {
                 errors[input] = true
                 errorCount++
             }
         })
+
         return { valid: errorCount === 0, errors }
     }, [])
 
@@ -123,10 +126,6 @@ const PassForm = (props) => {
         pinValidation(() => setShowPassword(true), 'show');
     }
 
-    const toggleCopy = () => {
-        pinValidation((pass) => navigator.clipboard.writeText(pass), 'copy');
-    }
-
     const onClosePin = useCallback((password = '') => {
         setOpenPin(false)
         if (password) {
@@ -172,6 +171,30 @@ const PassForm = (props) => {
                             helperText={formErrors.uri && 'Invalid entry'}
                         />
                         <TextField
+                            id="username"
+                            name="username"
+                            label="Username"
+                            value={formData.username}
+                            onChange={handleChange}
+                            error={formErrors.username}
+                            helperText={formErrors.username && 'Invalid entry'}
+                            InputProps={{
+                                endAdornment:
+                                    <>
+                                        {formData.hasOwnProperty('_id') &&
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                onClick={() => formData.username && navigator.clipboard.writeText(formData.username)}
+                                                edge="end"
+                                            >
+                                                <ContentCopy />
+                                            </IconButton>
+                                        </InputAdornment>
+                                        }
+                                    </>,
+                            }}
+                        />
+                        <TextField
                             type={showPassword ? 'text' : 'password'}
                             id="password"
                             name="password"
@@ -196,7 +219,7 @@ const PassForm = (props) => {
                                             </InputAdornment>
                                             <InputAdornment position="end">
                                                 <IconButton
-                                                    onClick={toggleCopy}
+                                                    onClick={() => pinValidation((pass) => navigator.clipboard.writeText(pass), 'copy')}
                                                     edge="end"
                                                 >
                                                     <ContentCopy />
