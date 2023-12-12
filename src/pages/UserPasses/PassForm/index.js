@@ -48,10 +48,10 @@ const PassForm = (props) => {
     const validateForm = useCallback((formData = {}) => {
         const errors = {}
         let errorCount = 0
-        const notRequired = ['notes', 'username'];
+        const required = ['name', 'password'];
 
         Object.keys(formData).forEach(input => {
-            if (!notRequired.includes(input) && formData[input] === '') {
+            if (required.includes(input) && formData[input] === '') {
                 errors[input] = true
                 errorCount++
             }

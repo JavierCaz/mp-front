@@ -64,9 +64,11 @@ const UserPassItem = (props) => {
                     </Grid>
 
                     <Grid container alignItems="center">
+                        {uri && 
                         <Grid item>
                             <img height="18" width="18" src={getFaviconDomainFromUri(uri)} style={{marginRight: '5px'}} />
                         </Grid>
+                        }
                         <Grid item>
                             <EllipsisTextLine variant="body2" gutterBottom>
                                 {uri}
