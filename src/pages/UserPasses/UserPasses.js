@@ -3,17 +3,31 @@ import axios from 'axios';
 
 import { useLoadingBarContext, useSetPinDialogContext, useSnackBarContext } from 'hooks';
 
-import { Grid, IconButton, TextField } from '@mui/material';
+import { Grid, IconButton, TextField, Modal, Box, Typography, Button } from '@mui/material';
 import UserPassItem from './UserPassItem';
 import PassForm from './PassForm';
 import { Add } from '@mui/icons-material';
+
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
 
 const UserPasses = () => {
     /*----STATE----*/
     const [userPasses, setUserPasses] = useState([])
     const [searchValue, setSearchValue] = useState('');
     const [openForm, setOpenForm] = useState(false)
+    const [openDeleteModal, setOpenDeleteModal] = useState(false)
     const [passObject, setPassObject] = useState()
+    const [deletePassId, setDeletePassId] = useState()
 
     /*----HOOKS----*/
     const { startProgress, stopProgress } = useLoadingBarContext()
@@ -84,13 +98,11 @@ const UserPasses = () => {
 
     const deletePass = useCallback(async (passId) => {
         startProgress()
-        if (window.confirm('Are you sure you want to delete this password?')) {
-            try {
-                await axios.delete(`/api/passes/${passId}`)
-                getUserPasses()
-            } catch (error) {
-                snackBar(error.message)
-            }
+        try {
+            await axios.delete(`/api/passes/${passId}`)
+            getUserPasses()
+        } catch (error) {
+            snackBar(error.message)
         }
         stopProgress()
     }, [getUserPasses, snackBar, startProgress, stopProgress])
@@ -117,7 +129,10 @@ const UserPasses = () => {
                         notes={pass.notes}
                         favorite={pass.favorite}
                         handleEdit={() => { openPassForm(pass) }}
-                        handleDelete={() => { deletePass(pass._id) }}
+                        handleDelete={() => { 
+                            setDeletePassId(pass._id);
+                            setOpenDeleteModal(true);
+                        }}
                     />
                 ))}
                 <PassForm {...{
@@ -130,6 +145,38 @@ const UserPasses = () => {
                     stopProgress
                 }} />
             </Grid>
+
+            <Modal
+                open={openDeleteModal}
+                onClose={() => {setOpenDeleteModal(false)}}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style} >
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                        Are you sure?
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2, mb: 2 }}>
+                        Doing this will remove it permanently.
+                    </Typography>
+
+                    <Grid container spacing={2} justifyContent="flex-end">
+                        <Grid item>
+                            <Button variant="contained" color="action" onClick={() => setOpenDeleteModal(false)}>Cancel</Button>
+                        </Grid>
+                        <Grid item>
+                            <Button 
+                                variant="contained" 
+                                color="error" 
+                                onClick={() => {
+                                    setOpenDeleteModal(false);
+                                    deletePass(deletePassId);
+                                }}
+                            >Delete</Button>
+                        </Grid>
+                    </Grid>
+                </Box>
+            </Modal>
         </Fragment>
     )
 }
